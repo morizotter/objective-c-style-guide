@@ -36,6 +36,7 @@ Here are some of the documents from Apple that informed the style guide. If some
 * [Image Naming](#image-naming)
 * [Booleans](#booleans)
 * [Singletons](#singletons)
+* [Categories](#categories)
 * [Xcode Project](#xcode-project)
 
 ## Dot-Notation Syntax
@@ -601,6 +602,12 @@ Singleton objects should use a thread-safe pattern for creating their shared ins
 }
 ```
 This will prevent [possible and sometimes prolific crashes](http://cocoasamurai.blogspot.com/2011/04/singletons-your-doing-them-wrong.html).
+
+## Categories
+
+ * Categories should be named for the sort of functionality they provide. Don't create umbrella categories.
+ * Category methods should always be prefixed.
+ * If you need to expose private methods for subclasses or unit testing, create a class extension named `Class+Private`.
 
 ## Xcode project
 
