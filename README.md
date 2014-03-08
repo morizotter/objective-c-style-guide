@@ -624,7 +624,7 @@ This will prevent [possible and sometimes prolific crashes](http://cocoasamurai.
 //Segue
 #define MZRMainToDetailSegue                 @"MainToDetail"
 #define MZREmbedProjectsSegue                 @"EmbedProjects"
-
+```
 
 ## Directory
 
