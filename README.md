@@ -2,8 +2,14 @@
 
 This style guide outlines the coding conventions of me. I welcome your feedback in [issues](https://github.com/morizotter/objetive-c-style-guide/issues), [pull requests](https://github.com/morizotter/objetive-c-style-guide/pulls) and [tweets](https://twitter.com/morizotter).
 
-## Introduction
+# Background
 
+Here are some of the documents from Apple that informed the style guide. If something isn't mentioned here, it's probably covered in great detail in one of these:
+
+* [The Objective-C Programming Language](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjectiveC/Introduction/introObjectiveC.html)
+* [Cocoa Fundamentals Guide](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CocoaFundamentals/Introduction/Introduction.html)
+* [Coding Guidelines for Cocoa](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CodingGuidelines/CodingGuidelines.html)
+* [iOS App Programming Guide](http://developer.apple.com/library/ios/#documentation/iphone/conceptual/iphoneosprogrammingguide/Introduction/Introduction.html)
 
 ## Table of Contents
 
@@ -14,7 +20,9 @@ This style guide outlines the coding conventions of me. I welcome your feedback 
 * [Error handling](#error-handling)
 * [Methods](#methods)
 * [Variables](#variables)
+* [Property Attributes](#property-attributes)
 * [Naming](#naming)
+  * [Underscores](#underscores)
 * [Comments](#comments)
 * [Init & Dealloc](#init-and-dealloc)
 * [Literals](#literals)
@@ -22,6 +30,7 @@ This style guide outlines the coding conventions of me. I welcome your feedback 
 * [Constants](#constants)
 * [Enumerated Types](#enumerated-types)
 * [Private Properties](#private-properties)
+* [Case Statements](#case-statements)
 * [Image Naming](#image-naming)
 * [Booleans](#booleans)
 * [Singletons](#singletons)
@@ -60,8 +69,34 @@ else {
 //Do something else
 }
 ```
+
 * There should be exactly one blank line between methods to aid in visual clarity and organization. Whitespace within methods should separate functionality, but often there should probably be new methods.
 * `@synthesize` and `@dynamic` should each be declared on new lines in the implementation.
+* Colon-aligning method invocation should often be avoided.  There are cases where a method signature may have >= 3 colons and colon-aligning makes the code more readable. Please do **NOT** however colon align methods containing blocks because Xcode's indenting makes it illegible.
+
+**Preferred:**
+
+```objc
+// blocks are easily readable
+[UIView animateWithDuration:1.0 animations:^{
+  // something
+} completion:^(BOOL finished) {
+  // something
+}];
+```
+
+**Not Preferred:**
+
+```objc
+// colon-aligning makes the block indentation hard to read
+[UIView animateWithDuration:1.0
+                 animations:^{
+                     // something
+                 }
+                 completion:^(BOOL finished) {
+                     // something
+                 }];
+```
 
 ## Conditionals
 
@@ -131,13 +166,28 @@ Some of Apple’s APIs write garbage values to the error parameter (if non-NULL)
 
 ## Methods
 
-In method signatures, there should be a space after the scope (-/+ symbol). There should be a space between the method segments.
+In method signatures, there should be a space after the method type (-/+ symbol). There should be a space between the method segments (matching Apple's style).  Always include a keyword and be descriptive with the word before the argument which describes the argument.
 
-**For Example**:
+The usage of the word "and" is reserved.  It should not be used for multiple parameters as illustrated in the `initWithWidth:height:` example below.
 
+**Preferred:**
 ```objc
 - (void)setExampleText:(NSString *)text image:(UIImage *)image;
+- (void)sendAction:(SEL)aSelector to:(id)anObject forAllCells:(BOOL)flag;
+- (id)viewWithTag:(NSInteger)tag;
+- (instancetype)initWithWidth:(CGFloat)width height:(CGFloat)height;
 ```
+
+**Not Preferred:**
+
+```objc
+-(void)setT:(NSString *)text i:(UIImage *)image;
+- (void)sendAction:(SEL)aSelector :(id)anObject :(BOOL)flag;
+- (id)taggedView:(NSInteger)tag;
+- (instancetype)initWithWidth:(CGFloat)width andHeight:(CGFloat)height;
+- (instancetype)initWith:(int)width and:(int)height;  // Never do this.
+```
+
 ## Variables
 
 Variables should be named as descriptively as possible. Single letter variable names should be avoided except in `for()` loops.
@@ -162,6 +212,24 @@ Property definitions should be used in place of naked instance variables wheneve
 @interface NYTSection : NSObject {
     NSString *headline;
 }
+```
+
+## Property Attributes
+
+Property attributes should be explicitly listed, and will help new programmers when reading the code.  The order of properties should be storage then atomicity, which is consistent with automatically generated code when connecting UI elements from Interface Builder.
+
+**Preferred:**
+
+```objc
+@property (weak, nonatomic) IBOutlet UIView *containerView;
+@property (strong, nonatomic) NSString *tutorialName;
+```
+
+**Not Preferred:**
+
+```objc
+@property (nonatomic, weak) IBOutlet UIView *containerView;
+@property (nonatomic) NSString *tutorialName;
 ```
 
 ## Naming
@@ -211,6 +279,14 @@ Instance variables should be camel-case with the leading word being lowercase, a
 ```objc
 id varnm;
 ```
+
+### Underscores
+
+When using properties, instance variables should always be accessed and mutated using `self.`. This means that all properties will be visually distinct, as they will all be prefaced with `self.`. 
+
+An exception to this: inside initializers, the backing instance variable (i.e. _variableName) should be used directly to avoid any potential side effects of the getters/setters.
+
+Local variables should not contain underscores.
 
 ## Comments
 
@@ -318,6 +394,85 @@ typedef NS_ENUM(NSInteger, MZRAdRequestState) {
 };
 ```
 
+You can also make explicit value assignments (showing older k-style constant definition):
+
+```objc
+typedef NS_ENUM(NSInteger, RWTGlobalConstants) {
+  RWTPinSizeMin = 1,
+  RWTPinSizeMax = 5,
+  RWTPinCountMin = 100,
+  RWTPinCountMax = 500,
+};
+```
+
+Older k-style constant definitions should be **avoided** unless writing CoreFoundation C code (unlikely).
+
+**Not Preferred:**
+
+```objc
+enum GlobalConstants {
+  kMaxPinSize = 5,
+  kMaxPinCount = 500,
+};
+```
+
+## Case Statements
+
+Braces are not required for case statements, unless enforced by the complier.  
+When a case contains more than one line, braces should be added.
+
+```objc
+switch (condition) {
+  case 1:
+    // ...
+    break;
+  case 2: {
+    // ...
+    // Multi-line example using braces
+    break;
+  }
+  case 3:
+    // ...
+    break;
+  default: 
+    // ...
+    break;
+}
+```
+
+There are times when the same code can be used for multiple cases, and a fall-through should be used.  A fall-through is the removal of the 'break' statement for a case thus allowing the flow of execution to pass to the next case value.  A fall-through should be commented for coding clarity.
+
+```objc
+switch (condition) {
+  case 1:
+    // ** fall-through! **
+  case 2:
+    // code executed for values 1 and 2
+    break;
+  default: 
+    // ...
+    break;
+}
+```
+
+When using an enumerated type for a switch, 'default' is not needed.   For example:
+
+```objc
+RWTLeftMenuTopItemType menuType = RWTLeftMenuTopItemMain;
+
+switch (menuType) {
+  case RWTLeftMenuTopItemMain:
+    // ...
+    break;
+  case RWTLeftMenuTopItemShows:
+    // ...
+    break;
+  case RWTLeftMenuTopItemSchedule:
+    // ...
+    break;
+}
+```
+
 ## Private Properties
 
 Private properties should be declared in class extensions (anonymous categories) in the implementation file of a class. Named categories (such as `NYTPrivate` or `private`) should never be used unless extending another class.
@@ -412,15 +567,6 @@ This will prevent [possible and sometimes prolific crashes](http://cocoasamurai.
 The physical files should be kept in sync with the Xcode project files in order to avoid file sprawl. Any Xcode groups created should be reflected by folders in the filesystem. Code should be grouped not only by type, but also by feature for greater clarity.
 
 When possible, always turn on "Treat Warnings as Errors" in the target's Build Settings and enable as many [additional warnings](http://boredzo.org/blog/archives/2009-11-07/warnings) as possible. If you need to ignore a specific warning, use [Clang's pragma feature](http://clang.llvm.org/docs/UsersManual.html#controlling-diagnostics-via-pragmas).
-
-# Apple Official Documents
-
-Here are some of the documents from Apple that informed the style guide. If something isn't mentioned here, it's probably covered in great detail in one of these:
-
-* [The Objective-C Programming Language](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjectiveC/Introduction/introObjectiveC.html)
-* [Cocoa Fundamentals Guide](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CocoaFundamentals/Introduction/Introduction.html)
-* [Coding Guidelines for Cocoa](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CodingGuidelines/CodingGuidelines.html)
-* [iOS App Programming Guide](http://developer.apple.com/library/ios/#documentation/iphone/conceptual/iphoneosprogrammingguide/Introduction/Introduction.html)
 
 
 # Other Objective-C Style Guides
