@@ -25,8 +25,10 @@ Here are some of the documents from Apple that informed the style guide. If some
   * [Underscores](#underscores)
 * [Comments](#comments)
 * [Init & Dealloc](#init-and-dealloc)
+* [Class Constructor Methods](#class-constructor-methods)
 * [Literals](#literals)
 * [CGRect Functions](#cgrect-functions)
+* [Golden Path](#golden-path)
 * [Constants](#constants)
 * [Enumerated Types](#enumerated-types)
 * [Private Properties](#private-properties)
@@ -311,6 +313,18 @@ Block comments should generally be avoided, as code should be as self-documentin
 }
 ```
 
+## Class Constructor Methods
+
+Where class constructor methods are used, these should always return type of 'instancetype' and never 'id'. This ensures the compiler correctly infers the result type. 
+
+```objc
+@interface Airplane
++ (instancetype)airplaneWithType:(RWTAirplaneType)type;
+@end
+```
+
+More information on instancetype can be found on [NSHipster.com](http://nshipster.com/instancetype/).
+
 ## Literals
 
 `NSString`, `NSDictionary`, `NSArray`, and `NSNumber` literals should be used whenever creating immutable instances of those objects. Pay special care that `nil` values not be passed into `NSArray` and `NSDictionary` literals, as this will cause a crash.
@@ -359,6 +373,32 @@ CGFloat x = frame.origin.x;
 CGFloat y = frame.origin.y;
 CGFloat width = frame.size.width;
 CGFloat height = frame.size.height;
+```
+
+## Golden Path
+
+When coding with conditionals, the left hand margin of the code should be the "golden" or "happy" path.  That is, don't nest `if` statements.  Multiple return statements are OK.
+
+**Preferred:**
+
+```objc
+- (void)someMethod {
+  if (![someOther boolValue]) {
+	return;
+  }
+
+  //Do something important
+}
+```
+
+**Not Preferred:**
+
+```objc
+- (void)someMethod {
+  if ([someOther boolValue]) {
+    //Do something important
+  }
+}
 ```
 
 ## Constants
