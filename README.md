@@ -37,6 +37,8 @@ Here are some of the documents from Apple that informed the style guide. If some
 * [Booleans](#booleans)
 * [Singletons](#singletons)
 * [Categories](#categories)
+* [Storiboard](#storyboard)
+* [Directory](#directory)
 * [Xcode Project](#xcode-project)
 
 ## Dot-Notation Syntax
@@ -605,9 +607,44 @@ This will prevent [possible and sometimes prolific crashes](http://cocoasamurai.
 
 ## Categories
 
- * Categories should be named for the sort of functionality they provide. Don't create umbrella categories.
- * Category methods should always be prefixed.
- * If you need to expose private methods for subclasses or unit testing, create a class extension named `Class+Private`.
+* Categories should be named for the sort of functionality they provide. Don't create umbrella categories.
+* Category methods should always be prefixed.
+* If you need to expose private methods for subclasses or unit testing, create a class extension named `Class+Private`.
+
+
+## Storyboard
+
+* Use Storyboard and autolayout.
+* View ID and Segue ID is defined in MZRConstants.
+
+```
+//StoryboardIdentifier
+#define MZRMainStoryboardIdentifier          @"Main"
+
+//Segue
+#define MZRMainToDetailSegue                 @"MainToDetail"
+#define MZREmbedProjectsSegue                 @"EmbedProjects"
+
+
+## Directory
+
+```
+.
++-- Classes
+|   +-- MZRAppDelegate.h
+|   +-- MZRAppDelegate.m
+|   +-- MZRConstants.h
+|   +-- Controllers
+|   +-- Models
+|   +-- Views
+|   +-- Categories
++-- Resources
+|   +-- Storyboards
+|   +-- Localizations
+|   +-- Images
+|   +-- Sounds
++-- Supporting Files
+``` 
 
 ## Xcode project
 
@@ -618,11 +655,13 @@ When possible, always turn on "Treat Warnings as Errors" in the target's Build S
 
 # Other Objective-C Style Guides
 
-These are the reference when I made this style guide:
+The references when I made this style guide:
 
 * [NYTimes](https://github.com/NYTimes/objective-c-style-guide)
 * [Raywenderlich](https://github.com/raywenderlich/objective-c-style-guide)
+* [Wantedly](https://github.com/wantedly/objective-c-style-guide#error-handling)
 * [Github](https://github.com/github/objective-c-conventions)
+* [RobotsAndPencils](https://github.com/RobotsAndPencils/objective-c-style-guide)
 
 And these are the other style guides for future reference:
 
