@@ -637,6 +637,7 @@ This will prevent [possible and sometimes prolific crashes](http://cocoasamurai.
 |   +-- Controllers
 |   +-- Models
 |   +-- Views
+|   +-- Libraries
 |   +-- Categories
 +-- Resources
 |   +-- Storyboards
